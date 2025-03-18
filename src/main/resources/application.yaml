@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: travel
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/travel
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+jwt:
+  signerKey: "ctTfcGw4IP2clJH+M6Nrx4EXs4mMW0Zk2CjNhW74KZka3TDSt5UpThtzg9iIB2CY"
+  valid-duraion: 3600
+  refresh-duration: 18000
+
+
+logging:
+  level:
+    org.springframework.boot.web: DEBUG
