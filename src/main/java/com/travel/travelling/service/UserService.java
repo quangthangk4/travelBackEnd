@@ -45,6 +45,7 @@ public class UserService {
 
         // save and return user
         user = userRepository.save(user);
+
         return userMapper.toUserResponse(user);
     }
 

@@ -7,17 +7,29 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse> duplicateEmail(DataIntegrityViolationException exception) {
-        ErrorCode errorCode = ErrorCode.DATA_CONFUSE;
+        ErrorCode errorCode = ErrorCode.DUPLICATE_RESOURCE; // Chọn mã lỗi phù hợp
+        String message = exception.getRootCause().getMessage(); // Lấy lỗi từ database
+
+        String errorMessage;
+        if (message.contains("Duplicate entry")) {
+            String duplicateValue = message.split("'")[1]; // Lấy giá trị bị trùng (Vietnam Airlines)
+            errorMessage = duplicateValue + " already exists.";
+        } else {
+            errorMessage = "Database constraint violation: " + message;
+        }
+
         ApiResponse apiResponse = ApiResponse.builder()
                 .code(errorCode.getCode())
-                .message(errorCode.getMessage())
+                .message(errorMessage)
                 .build();
 
         return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
