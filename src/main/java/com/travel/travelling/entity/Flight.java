@@ -18,16 +18,17 @@ public class Flight {
     private String id;
 
     private String flightNumber;
+
     private String departureAirport;
     private String arrivalAirport;
-    private String destination;
 
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
     private String status;
 
-    private double price; // Giá vé
-    private Long countTickets;
+    @Builder.Default
+    private int totalTickets = 180;   // Tổng số vé có sẵn
+    private int soldTickets;    // Số vé đã bán
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "airCraftId")

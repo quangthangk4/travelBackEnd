@@ -22,7 +22,7 @@ import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 public class SecurityConfig {
 
     public final String[] PUBLIC_ENDPOINT = {
-        "/auth/**", "/user/create"
+        "/auth/**", "/user/create", "/flight/search"
     };
 
     private final JwtDecoderCustom jwtDecoderCustom;
@@ -31,6 +31,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(author -> author
                 .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
+                .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINT).permitAll()
                 .anyRequest().authenticated());
 
 

@@ -6,12 +6,11 @@ import lombok.*;
 import java.io.Serializable;
 
 @Embeddable
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BookingId implements Serializable {
+public class TicketId implements Serializable {
     private String userId;
     private String flightId;
 }
