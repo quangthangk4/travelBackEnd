@@ -13,18 +13,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FlightResponse {
-    private String id;
-
+public class FlightTicketResponse {
     private String flightNumber;
     private String departureAirport;
     private String arrivalAirport;
 
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
-    private String status;
-    private Long totalTickets;   // Tổng số vé có sẵn
-    private Long soldTickets;    // Số vé đã bán
-
-    private AircraftResponse airCraft;
+    private AircraftTicketResponse airCraft;
 }

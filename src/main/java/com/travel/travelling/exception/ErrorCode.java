@@ -22,8 +22,8 @@ public enum ErrorCode {
     DEPARTURE_AND_DESTINATION_CANNOT_BE_SAME(1011, "Departure and destination cannot be the same!", HttpStatus.BAD_REQUEST),
     DEPARTURE_OR_DESTINATION_INVALID(1012, "Departure or destination is invalid!", HttpStatus.BAD_REQUEST),
     DEPARTURE_TIME_AFTER_ARRIVAL_TIME(1014, "Departure time must be before arrival time!", HttpStatus.BAD_REQUEST),
-
-
+    SEAT_ALREADY_BOOKED(1015, "Seat already booked!", HttpStatus.CONFLICT),
+    SEAT_NUMBER_INVALID(1016, "SeatNumber is invalid!", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode){

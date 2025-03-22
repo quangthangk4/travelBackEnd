@@ -20,5 +20,5 @@ public class Airline {
     private String name;
     private String description;
     private String country;
-    private String founded_year;
+    private String foundedYear;
 }

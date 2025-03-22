@@ -119,4 +119,17 @@ public class FlightService {
 
         return flights.stream().map(flightMapper::toFlightResponse).toList();
     }
+
+
+    // lấy thông tin chuyenes bay
+    public FlightResponse getFlight(String id){
+        Flight flight = flightRepository.findById(id).orElseThrow(
+                () -> new AppException(ErrorCode.FLIGHT_NOT_EXISTED));
+
+        return flightMapper.toFlightResponse(flight);
+    }
+
+
+    // cập nhật thông tin chuyến bay như delay ....
+
 }

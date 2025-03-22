@@ -5,16 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AirlineResponse {
-    private String id;
-    private String name;
-    private String description;
-    private String country;
-    private String foundedYear;
-
+public class AircraftTicketResponse {
+    private AirlineTicketResponse airline;
 }

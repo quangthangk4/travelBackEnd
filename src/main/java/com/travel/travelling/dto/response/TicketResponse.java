@@ -1,32 +1,25 @@
-package com.travel.travelling.entity;
+package com.travel.travelling.dto.response;
 
 import com.travel.travelling.constant.TicketStatus;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Getter
-@Setter
+
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Ticket {
+public class TicketResponse {
 
-    @EmbeddedId
-    private TicketId id;
+    private UserTicketReponse user;
 
-    @ManyToOne
-    @MapsId("userId")
-    @JoinColumn(name = "userId")
-    private User user;
-
-
-    @ManyToOne
-    @MapsId("flightId")
-    @JoinColumn(name = "flightId")
-    private Flight flight;
+    private FlightTicketResponse flight;
 
     private String seatNumber; // VD: A1, B2
 
@@ -37,5 +30,4 @@ public class Ticket {
     @Enumerated(EnumType.STRING)
     private TicketStatus status; // Trạng thái vé (ĐÃ ĐẶT, HỦY
     private double price; // Giá vé
-
 }

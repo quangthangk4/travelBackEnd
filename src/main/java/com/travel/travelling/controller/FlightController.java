@@ -2,10 +2,8 @@ package com.travel.travelling.controller;
 
 import com.travel.travelling.dto.request.FlightCreationRequest;
 import com.travel.travelling.dto.request.FlightSearchRequest;
-import com.travel.travelling.dto.response.AircraftResponse;
 import com.travel.travelling.dto.response.ApiResponse;
 import com.travel.travelling.dto.response.FlightResponse;
-import com.travel.travelling.entity.Flight;
 import com.travel.travelling.service.FlightService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -52,6 +50,15 @@ public class FlightController {
         return ApiResponse.<List<FlightResponse>>builder()
                 .message("search flight successfully")
                 .result(flightService.searchFlight(request))
+                .build();
+    }
+
+
+    @GetMapping("/{id}")
+    public ApiResponse<FlightResponse> getFlight(@PathVariable String id) {
+        return ApiResponse.<FlightResponse>builder()
+                .message("get flight successfully")
+                .result(flightService.getFlight(id))
                 .build();
     }
 }

@@ -10,11 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AirlineResponse {
-    private String id;
+public class AirlineTicketResponse {
     private String name;
-    private String description;
-    private String country;
-    private String foundedYear;
-
 }

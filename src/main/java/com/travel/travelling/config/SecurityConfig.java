@@ -13,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 
 @Configuration
 @EnableWebSecurity
@@ -22,7 +21,7 @@ import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 public class SecurityConfig {
 
     public final String[] PUBLIC_ENDPOINT = {
-        "/auth/**", "/user/create", "/flight/search"
+        "/auth/**", "/user/create", "/flight/search", "flight/{id}"
     };
 
     private final JwtDecoderCustom jwtDecoderCustom;
