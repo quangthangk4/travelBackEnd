@@ -12,6 +12,7 @@ import com.travel.travelling.constant.RolePrefix;
 import com.travel.travelling.repository.RoleRepository;
 import com.travel.travelling.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -34,6 +36,7 @@ public class UserService {
     // create user
     public UserResponse createUser(UserCreationRequest request) {
         User user = userMapper.toUser(request);
+        user.setAccountBalance(0);
 
         // encode password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -90,5 +93,18 @@ public class UserService {
         );
 
         return userMapper.toUserResponse(user);
+    }
+
+
+    // nộp tiền vào tài khoản
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public void depositMoney(double amount) {
+        String email = getMyInfo().getEmail();
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED)
+        );
+
+        user.setAccountBalance(user.getAccountBalance() + amount);
+        userRepository.save(user);
     }
 }

@@ -6,10 +6,12 @@ import com.travel.travelling.dto.response.ApiResponse;
 import com.travel.travelling.dto.response.UserResponse;
 import com.travel.travelling.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -51,6 +53,14 @@ public class UserController {
         userService.deleteUser(id);
         return ApiResponse.<Void>builder()
                 .message("user has been deleted")
+                .build();
+    }
+
+    @PutMapping("/deposit/{amount}")
+    public ApiResponse<Void> depositMoney(@PathVariable double amount){
+        userService.depositMoney(amount);
+        return ApiResponse.<Void>builder()
+                .message("deposit money successful")
                 .build();
     }
 }

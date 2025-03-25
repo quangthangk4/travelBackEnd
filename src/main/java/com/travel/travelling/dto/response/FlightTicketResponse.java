@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class FlightTicketResponse {
+    private String id;
     private String flightNumber;
     private String departureAirport;
     private String arrivalAirport;

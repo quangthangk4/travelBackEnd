@@ -33,6 +33,8 @@ public class User {
 
     private LocalDate birthday;
 
+    private double accountBalance;
+
     @ManyToMany
     private Set<Role> roles;
 

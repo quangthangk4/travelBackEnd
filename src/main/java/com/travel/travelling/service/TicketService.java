@@ -13,12 +13,16 @@ import com.travel.travelling.mapper.TicketMapper;
 import com.travel.travelling.mapper.UserMapper;
 import com.travel.travelling.repository.FlightRepository;
 import com.travel.travelling.repository.TicketRepository;
+import com.travel.travelling.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,16 +34,19 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final UserMapper userMapper;
     private final TicketMapper ticketMapper;
+    private final UserRepository userRepository;
 
     // create ticket when create flight
     @Transactional
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public TicketResponse createTickets(TicketBookRequest request){
+    public TicketResponse bookTicket(TicketBookRequest request){
         Flight flight = flightRepository.findById(request.getFlightId())
                 .orElseThrow(() -> new AppException(ErrorCode.FLIGHT_NOT_EXISTED));
 
         // 2️⃣ Kiểm tra người dùng có tồn tại không
-        User user = userMapper.toUser(userService.getMyInfo());
+        User user = userRepository.findByEmail(userService.getMyInfo().getEmail()).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED)
+        );
 
         // kiểm tra xem ghế chuẩn bị đặt có hợp lệ không
         if(!isValidSeatNumber(request.getSeatNumber(), flight.getTotalTickets()))
@@ -53,8 +60,13 @@ public class TicketService {
 
 
         // 4️⃣ Xác định giá vé dựa trên vị trí ghế
-        double basePrice = 100_000.0;
+        double basePrice = 1_000_000.0;
         double seatPrice = basePrice + (isWindowSeat(request.getSeatNumber()) ? 50_000.0 : 0.0);
+
+        // trừ tiền vé máy bay
+        if(user.getAccountBalance() < seatPrice) throw new AppException(ErrorCode.INSUFFICIENT_BALANCE);
+        user.setAccountBalance(user.getAccountBalance() - seatPrice);
+        userRepository.save(user);
 
         // 5️⃣ Lưu vé vào database
         Ticket ticket = Ticket.builder()
@@ -105,5 +117,35 @@ public class TicketService {
 
         char row = seatNumber.charAt(0); // Lấy ký tự đầu tiên, ví dụ: "A1" -> 'A'
         return row == 'A' || row == 'F'; // Ghế 'A' và 'F' là ghế cửa sổ
+    }
+
+
+    // get my ticket (chưa bay)
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public List<TicketResponse> getUpComingTickets(){
+        User user = userRepository.findByEmail(userService.getMyInfo().getEmail()).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED)
+        );
+        List<Ticket> tickets = ticketRepository.findByUser(user);
+        return tickets.stream()
+                .filter(ticket -> {
+                    return ticket.getFlight().getDepartureTime().isAfter(LocalDateTime.now());
+                })
+                .map(ticketMapper::toTicketResponse)
+                .collect(Collectors.toList());
+    }
+
+
+    // get ticket when user click one
+    public TicketResponse getTicketById(String flightId){
+        User user = userRepository.findByEmail(userService.getMyInfo().getEmail()).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        TicketId ticketId = new TicketId(user.getId(), flightId);
+        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(
+                () -> new AppException(ErrorCode.TICKET_NOT_EXISTED)
+        );
+
+        return ticketMapper.toTicketResponse(ticket);
     }
 }

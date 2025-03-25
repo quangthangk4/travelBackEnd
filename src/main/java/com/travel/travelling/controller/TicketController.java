@@ -5,14 +5,13 @@ import com.travel.travelling.dto.response.ApiResponse;
 import com.travel.travelling.dto.response.TicketResponse;
 import com.travel.travelling.service.TicketService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/ticket")
+@RequestMapping("/tickets")
 public class TicketController {
 
 
@@ -22,7 +21,25 @@ public class TicketController {
     public ApiResponse<TicketResponse> createTickets(@RequestBody TicketBookRequest request){
         return ApiResponse.<TicketResponse>builder()
                 .message("book ticket successfully")
-                .result(ticketService.createTickets(request))
+                .result(ticketService.bookTicket(request))
+                .build();
+    }
+
+
+    @GetMapping("/upcoming")
+    public ApiResponse<List<TicketResponse>> getUpcomingTickets(){
+        return ApiResponse.<List<TicketResponse>>builder()
+                .message("get upcoming tickets successfully")
+                .result(ticketService.getUpComingTickets())
+                .build();
+    }
+
+
+    @GetMapping("/{flightId}")
+    public ApiResponse<TicketResponse> getTicket(@PathVariable String flightId){
+        return ApiResponse.<TicketResponse>builder()
+                .message("get ticket successfully")
+                .result(ticketService.getTicketById(flightId))
                 .build();
     }
 }

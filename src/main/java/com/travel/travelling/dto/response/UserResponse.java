@@ -20,6 +20,7 @@ public class UserResponse {
     private String lastName;
     private String phone;
     private String cccd;
+    private double accountBalance;
     private LocalDate birthday;
     private Set<RoleResponse> roles;
 }
