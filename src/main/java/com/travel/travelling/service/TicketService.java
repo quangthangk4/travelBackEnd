@@ -16,6 +16,7 @@ import com.travel.travelling.repository.TicketRepository;
 import com.travel.travelling.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -136,7 +137,17 @@ public class TicketService {
     }
 
 
+    public boolean isTicketOwner(String flightId, String email) {
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) return false;
+
+        TicketId ticketId = new TicketId(user.getId(), flightId);
+        return ticketRepository.existsById(ticketId);
+    }
+
+
     // get ticket when user click one
+    @PreAuthorize("@ticketService.isTicketOwner(#flightId, authentication.name)")
     public TicketResponse getTicketById(String flightId){
         User user = userRepository.findByEmail(userService.getMyInfo().getEmail()).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -147,5 +158,29 @@ public class TicketService {
         );
 
         return ticketMapper.toTicketResponse(ticket);
+    }
+
+    @Transactional
+    @PreAuthorize("@ticketService.isTicketOwner(#flightId, authentication.name)")
+    public String cancelTicket(String flightId){
+        User user = userRepository.findByEmail(userService.getMyInfo().getEmail()).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        TicketId ticketId = new TicketId(user.getId(), flightId);
+        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(
+                () -> new AppException(ErrorCode.TICKET_NOT_EXISTED)
+        );
+
+        // hủy vé
+        ticketRepository.delete(ticket);
+
+
+        // hoàn tiền
+        double priceReturn = (double) ticket.getPrice()/2;
+        user.setAccountBalance(user.getAccountBalance() + priceReturn);
+        String message = String.format("hủy vé thành công, đã hoàn trả lại %.2f đồng vào tài khoản", priceReturn);
+        userRepository.save(user);
+
+        return message;
     }
 }

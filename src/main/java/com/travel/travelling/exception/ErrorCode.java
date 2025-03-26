@@ -26,6 +26,7 @@ public enum ErrorCode {
     SEAT_NUMBER_INVALID(1016, "SeatNumber is invalid!", HttpStatus.BAD_REQUEST),
     INSUFFICIENT_BALANCE(1017, "Not enough balance!, không đủ tiền kìa má, nộp tiền zo đi!", HttpStatus.BAD_REQUEST),
     TICKET_NOT_EXISTED(1016, "Ticket not existed", HttpStatus.BAD_REQUEST),
+    SEAT_NOT_HELD_BY_USER(1018, "Seat is not held by this user", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode){

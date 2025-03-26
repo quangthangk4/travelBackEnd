@@ -3,6 +3,7 @@ package com.travel.travelling.controller;
 import com.travel.travelling.dto.request.TicketBookRequest;
 import com.travel.travelling.dto.response.ApiResponse;
 import com.travel.travelling.dto.response.TicketResponse;
+import com.travel.travelling.service.TicketHoldService;
 import com.travel.travelling.service.TicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,14 +17,42 @@ public class TicketController {
 
 
     private final TicketService ticketService;
+    private final TicketHoldService ticketHoldService;
 
     @PostMapping("/book")
-    public ApiResponse<TicketResponse> createTickets(@RequestBody TicketBookRequest request){
+    public ApiResponse<TicketResponse> confirmPayment(@RequestBody TicketBookRequest request){
         return ApiResponse.<TicketResponse>builder()
                 .message("book ticket successfully")
-                .result(ticketService.bookTicket(request))
+                .result(ticketHoldService.confirmPayment(request))
                 .build();
     }
+
+    @PostMapping("/hold-seat")
+    public ApiResponse<Void> holdSeat(@RequestBody TicketBookRequest request){
+        boolean holdSeat = ticketHoldService.holdSeat(request);
+        String message = "hold seat successfully";
+        if (!holdSeat) message = "ghế đang có người giữ";
+        return ApiResponse.<Void>builder()
+                .message(message)
+                .build();
+    }
+
+    @DeleteMapping("/delete-hold-seat")
+    public ApiResponse<Void> deleteHoldSeat(@RequestBody TicketBookRequest request){
+        ticketHoldService.deleteHoldSeat(request);
+        return ApiResponse.<Void>builder()
+                .message("delete hold seat successfully")
+                .build();
+    }
+
+    @PutMapping("/extend-hold-seat")
+    public ApiResponse<TicketResponse> extendHoldSeat(@RequestBody TicketBookRequest request){
+        ticketHoldService.extendSeatHold(request);
+        return ApiResponse.<TicketResponse>builder()
+                .message("extend hold seat successfully")
+                .build();
+    }
+
 
 
     @GetMapping("/upcoming")
@@ -42,4 +71,12 @@ public class TicketController {
                 .result(ticketService.getTicketById(flightId))
                 .build();
     }
+
+    @DeleteMapping("/cancel-ticket/{flightId}")
+    public ApiResponse<String> cancelTicket(@PathVariable String flightId){
+        return ApiResponse.<String>builder()
+                .result(ticketService.cancelTicket(flightId))
+                .build();
+    }
+
 }
