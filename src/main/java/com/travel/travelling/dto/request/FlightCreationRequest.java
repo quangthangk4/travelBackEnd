@@ -23,5 +23,5 @@ public class FlightCreationRequest {
     private LocalDateTime arrivalTime;
     private String status;
 
-    private String nameAircraft;
+    private String aircraftId;
 }

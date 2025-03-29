@@ -45,7 +45,7 @@ public class AuthenticationService {
     @Value("${jwt.signerKey}")
     public String signerKey;
 
-    @Value("${jwt.valid-duraion}")
+    @Value("${jwt.valid-duration}")
     public String VALID_DURATION;
 
     @Value("${jwt.refresh-duration}")

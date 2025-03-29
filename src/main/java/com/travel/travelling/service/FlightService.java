@@ -72,7 +72,7 @@ public class FlightService {
             throw new AppException(ErrorCode.DEPARTURE_TIME_AFTER_ARRIVAL_TIME);
 
         // thêm máy bay
-        Aircraft aircraft = aircraftRepository.findByName(request.getNameAircraft()).orElseThrow(
+        Aircraft aircraft = aircraftRepository.findById(request.getAircraftId()).orElseThrow(
                 () -> new AppException(ErrorCode.AIRCRAFT_NOT_EXISTED));
 
 

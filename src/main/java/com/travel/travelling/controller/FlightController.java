@@ -45,7 +45,7 @@ public class FlightController {
     }
 
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     public ApiResponse<List<FlightResponse>> searchFlight(@RequestBody FlightSearchRequest request) {
         return ApiResponse.<List<FlightResponse>>builder()
                 .message("search flight successfully")
