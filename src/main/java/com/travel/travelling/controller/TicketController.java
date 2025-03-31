@@ -2,6 +2,7 @@ package com.travel.travelling.controller;
 
 import com.travel.travelling.dto.request.TicketBookRequest;
 import com.travel.travelling.dto.response.ApiResponse;
+import com.travel.travelling.dto.response.TicketBookedResponse;
 import com.travel.travelling.dto.response.TicketResponse;
 import com.travel.travelling.service.TicketHoldService;
 import com.travel.travelling.service.TicketService;
@@ -36,6 +37,14 @@ public class TicketController {
                 .message(message)
                 .build();
     }
+
+    @GetMapping("/available/{flightId}")
+    public ApiResponse<List<TicketBookedResponse>> getAvailableTickets(@PathVariable String flightId){
+        return ApiResponse.<List<TicketBookedResponse>>builder()
+                .result(ticketService.ticketBookedResponse(flightId))
+                .build();
+    }
+
 
     @DeleteMapping("/delete-hold-seat")
     public ApiResponse<Void> deleteHoldSeat(@RequestBody TicketBookRequest request){

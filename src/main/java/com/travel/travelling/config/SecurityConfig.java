@@ -28,7 +28,7 @@ import java.util.List;
 public class SecurityConfig {
 
     public final String[] PUBLIC_ENDPOINT = {
-        "/auth/**", "/user/create", "/flight/search", "flight/{id}", "/airports/**",
+        "/auth/**", "/user/create", "/flight/search", "flight/{id}", "/airports/**", "tickets/available/{flightId}",
     };
 
     private final JwtDecoderCustom jwtDecoderCustom;

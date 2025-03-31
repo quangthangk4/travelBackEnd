@@ -7,8 +7,6 @@ services:
       - "${REDIS_PORT}:${REDIS_PORT}"
     networks:
       - travel-network
-    volumes:
-      - redis_data:/data
 
   mysql:
     image: mysql:8.0.41-debian
@@ -26,18 +24,22 @@ services:
   travel-backend:
     image: travel-backend:v1.0.0
     container_name: travel-backend
+    depends_on:
+      - mysql
+      - redis
     ports:
       - "8080:8080"
     networks:
       - travel-network
     volumes:
-      - ./src:/app/src
-    restart: no
+      - .:/app
+    restart: unless-stopped
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - SPRING_DATASOURCE_USERNAME=root
       - SIGNER_KEY=${SIGNER_KEY}
+
 
 
 volumes:

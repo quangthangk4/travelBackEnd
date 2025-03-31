@@ -2,6 +2,7 @@ package com.travel.travelling.service;
 
 import com.travel.travelling.constant.TicketStatus;
 import com.travel.travelling.dto.request.TicketBookRequest;
+import com.travel.travelling.dto.response.TicketBookedResponse;
 import com.travel.travelling.dto.response.TicketResponse;
 import com.travel.travelling.entity.Flight;
 import com.travel.travelling.entity.Ticket;
@@ -16,8 +17,6 @@ import com.travel.travelling.repository.TicketRepository;
 import com.travel.travelling.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.message.StringFormattedMessage;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +60,7 @@ public class TicketService {
 
 
         // 4️⃣ Xác định giá vé dựa trên vị trí ghế
-        double basePrice = 1_000_000.0;
+        double basePrice = flight.getBasePrice();
         double seatPrice = basePrice + (isWindowSeat(request.getSeatNumber()) ? 50_000.0 : 0.0);
 
         // trừ tiền vé máy bay
@@ -95,20 +94,27 @@ public class TicketService {
 
     // check ghế có hợp lệ không
     public boolean isValidSeatNumber(String seatNumber, int totalSeats) {
-        // 1️⃣ Kiểm tra định dạng ghế (VD: A1, B10)
-        if (!seatNumber.matches("^[A-F][0-9]+$")) {
+        // 1️ Kiểm tra định dạng mới (VD: 12A, 23B)
+        if (!seatNumber.matches("^[0-9]+[A-F]$")) {
             return false;
         }
 
-        // 2️⃣ Lấy hàng ghế và số ghế từ chuỗi
-        char row = seatNumber.charAt(0); // Chữ cái đầu (hàng ghế)
-        int seatNum = Integer.parseInt(seatNumber.substring(1)); // Số ghế
+        // 2️ Lấy số ghế và hàng ghế từ chuỗi
+        int seatNum = Integer.parseInt(seatNumber.substring(0, seatNumber.length() - 1)); // Lấy số ghế
+        char row = seatNumber.charAt(seatNumber.length() - 1); // Lấy chữ cái cuối cùng (hàng ghế)
 
-        // 3️⃣ Tính tổng số ghế trên mỗi hàng
+        // 3️ Tính tổng số ghế trên mỗi hàng
         int maxSeatsPerRow = totalSeats / 6;
 
-        // 4️⃣ Kiểm tra số ghế có hợp lệ không
+        // 4️ Kiểm tra số ghế có hợp lệ không
         return seatNum >= 1 && seatNum <= maxSeatsPerRow;
+    }
+
+    // lấy tất cả ghế đã được đặt,
+    public List<TicketBookedResponse> ticketBookedResponse(String flightId){
+        List<Ticket> tickets = ticketRepository.findAllByFlightIdAndAvailable(flightId, false);
+
+        return tickets.stream().map(ticketMapper::toTicketBookedResponse).toList();
     }
 
 
@@ -116,9 +122,10 @@ public class TicketService {
     private boolean isWindowSeat(String seatNumber) {
         if (seatNumber == null || seatNumber.length() < 2) return false;
 
-        char row = seatNumber.charAt(0); // Lấy ký tự đầu tiên, ví dụ: "A1" -> 'A'
+        char row = seatNumber.charAt(seatNumber.length() - 1); // Lấy chữ cái cuối cùng (A, B, C, D, E, F)
         return row == 'A' || row == 'F'; // Ghế 'A' và 'F' là ghế cửa sổ
     }
+
 
 
     // get my ticket (chưa bay)

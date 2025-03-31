@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum VietnamAirport {
-    TAN_SON_NHAT("Sân bay Quốc tế Tân Sơn Nhất", 10.8188, 106.652, "Việt Nam", "VN", "SGN", "Thành phố Hồ Chí Minh"),
+    TAN_SON_NHAT("Sân bay Quốc tế Tân Sơn Nhất", 10.8188, 106.652, "Việt Nam", "VN", "SGN", "TP Hồ Chí Minh"),
     NOI_BAI("Sân bay Quốc tế Nội Bài", 21.221201, 105.806999, "Việt Nam", "VN", "HAN", "Hà Nội"),
     DA_NANG("Sân bay Quốc tế Đà Nẵng", 16.0439, 108.198997, "Việt Nam", "VN", "DAD", "Đà Nẵng"),
     PHU_QUOC("Sân bay Quốc tế Phú Quốc", 10.1698, 103.9931, "Việt Nam", "VN", "PQC", "Kiên Giang"),
