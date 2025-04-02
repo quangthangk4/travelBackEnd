@@ -3,7 +3,6 @@ package com.travel.travelling.service;
 import com.travel.travelling.constant.VietnamAirport;
 import com.travel.travelling.dto.request.FlightCreationRequest;
 import com.travel.travelling.dto.request.FlightSearchRequest;
-import com.travel.travelling.dto.response.AircraftResponse;
 import com.travel.travelling.dto.response.FlightResponse;
 import com.travel.travelling.entity.Aircraft;
 import com.travel.travelling.entity.Flight;
@@ -12,6 +11,7 @@ import com.travel.travelling.exception.ErrorCode;
 import com.travel.travelling.mapper.FlightMapper;
 import com.travel.travelling.repository.AircraftRepository;
 import com.travel.travelling.repository.FlightRepository;
+import com.travel.travelling.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,12 +19,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,6 +32,7 @@ public class FlightService {
     private final FlightRepository flightRepository;
     private final AircraftRepository aircraftRepository;
     private final FlightMapper flightMapper;
+    private final TicketRepository ticketRepository;
 
     // create flight
     @PreAuthorize("hasRole('ADMIN')")
@@ -72,7 +70,7 @@ public class FlightService {
             throw new AppException(ErrorCode.DEPARTURE_TIME_AFTER_ARRIVAL_TIME);
 
         // thêm máy bay
-        Aircraft aircraft = aircraftRepository.findByName(request.getNameAircraft()).orElseThrow(
+        Aircraft aircraft = aircraftRepository.findById(request.getAircraftId()).orElseThrow(
                 () -> new AppException(ErrorCode.AIRCRAFT_NOT_EXISTED));
 
 
@@ -95,6 +93,7 @@ public class FlightService {
     }
 
 
+
     // Get all flight
     @PreAuthorize("hasRole('ADMIN')")
     public List<FlightResponse> getAllFlights() {
@@ -107,7 +106,6 @@ public class FlightService {
 
         // chỉ lọc ra những chuyến bay sau 3h khởi hành máy bay
         List<Flight> flights = flightRepository.findAllByDepartureAirportAndArrivalAirport(request.getDepartureAirport(), request.getArrivalAirport());
-        log.info("danh sách flights: {}", flights.stream().toList());
 
 
         flights = flights.stream().filter(flight ->

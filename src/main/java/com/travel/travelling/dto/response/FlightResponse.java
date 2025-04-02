@@ -22,6 +22,8 @@ public class FlightResponse {
 
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
+
+    private double basePrice;
     private String status;
     private Long totalTickets;   // Tổng số vé có sẵn
     private Long soldTickets;    // Số vé đã bán

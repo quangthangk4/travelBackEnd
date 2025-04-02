@@ -22,6 +22,9 @@ public class Aircraft {
     @Column(nullable = false)
     private String model;
 
+    @Builder.Default
+    private int countSeat = 240;
+
     private String manufacturer;
 
     @ManyToOne(fetch = FetchType.LAZY)

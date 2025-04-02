@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Random;
 
 @Entity
 @Getter
@@ -27,8 +28,10 @@ public class Flight {
     private String status;
 
     @Builder.Default
-    private int totalTickets = 180;   // Tổng số vé có sẵn
+    private int totalTickets = 240;   // Tổng số vé có sẵn
     private int soldTickets;    // Số vé đã bán
+
+    private double basePrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "airCraftId")

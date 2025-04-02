@@ -38,4 +38,18 @@ public class Ticket {
     private TicketStatus status; // Trạng thái vé (ĐÃ ĐẶT, HỦY
     private double price; // Giá vé
 
+
+    @Override
+    public String toString() {
+        return "Ticket{" +
+                "id=" + id +
+                ", user=" + user +
+                ", flight=" + flight +
+                ", seatNumber='" + seatNumber + '\'' +
+                ", bookingDate=" + bookingDate +
+                ", available=" + available +
+                ", status=" + status +
+                ", price=" + price +
+                '}';
+    }
 }

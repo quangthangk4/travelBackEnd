@@ -3,9 +3,9 @@ spring:
     name: travel
 
   datasource:
-    url: jdbc:mysql://localhost:3306/travel
-    username: root
-    password: 123456
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/travel}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -15,17 +15,21 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
     show-sql: true
+    
+#  docker:
+#    compose:
+#      enabled: false
 
   data:
     redis:
-      host:  localhost
+      host: localhost
       port: 6379
 
 
 
 jwt:
-  signerKey: "ctTfcGw4IP2clJH+M6Nrx4EXs4mMW0Zk2CjNhW74KZka3TDSt5UpThtzg9iIB2CY"
-  valid-duraion: 3600
+  signerKey: ${SIGNER_KEY:ctTfcGw4IP2clJH+M6Nrx4EXs4mMW0Zk2CjNhW74KZka3TDSt5UpThtzg9iIB2CY}
+  valid-duration: 3600 #second
   refresh-duration: 18000
 
 

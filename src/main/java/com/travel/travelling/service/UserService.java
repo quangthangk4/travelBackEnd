@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -63,16 +64,24 @@ public class UserService {
     // update User
     @PostAuthorize("returnObject.email == authentication.name")
     public UserResponse updateUser(UserUpdateRequest request) {
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(
+        User user = userRepository.findByEmail(getMyInfo().getEmail()).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        userMapper.updateUser(user, request);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
+        if (request.getLastName() != null) user.setLastName(request.getLastName());
+        if (request.getPhone() != null) user.setPhone(request.getPhone());
+        if (request.getCccd() != null) user.setCccd(request.getCccd());
+        if (request.getBirthday() != null) user.setBirthday(request.getBirthday());
+
+        // Chỉ cập nhật password nếu có giá trị hợp lệ
+        if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
 
         user = userRepository.save(user);
-
         return userMapper.toUserResponse(user);
     }
+
 
 
     // delete User

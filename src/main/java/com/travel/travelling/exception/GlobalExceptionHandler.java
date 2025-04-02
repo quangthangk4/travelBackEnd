@@ -1,16 +1,14 @@
 package com.travel.travelling.exception;
 
 import com.travel.travelling.dto.response.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -19,13 +17,19 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = ErrorCode.DUPLICATE_RESOURCE; // Chọn mã lỗi phù hợp
         String message = exception.getRootCause().getMessage(); // Lấy lỗi từ database
 
-        String errorMessage;
+        String errorMessage = "Lỗi không thể xóa dữ liệu: ";
         if (message.contains("Duplicate entry")) {
             String duplicateValue = message.split("'")[1]; // Lấy giá trị bị trùng (Vietnam Airlines)
             errorMessage = duplicateValue + " already exists.";
-        } else {
-            errorMessage = "Database constraint violation: " + message;
-        }
+        } else if (message.contains("foreign key constraint fails")) {
+            // Tìm kiếm tên của bảng khóa ngoại (Ví dụ: "Aircraft")
+            String[] parts = message.split("`");
+            if (parts.length >= 3) {
+                String relatedTable = parts[3];  // Tên bảng liên quan
+                errorMessage += "Vui lòng xóa các " + relatedTable + " liên quan trước khi xóa.";
+            } else {
+                errorMessage += "Có sự phụ thuộc dữ liệu không thể xóa.";
+            }}
 
         ApiResponse apiResponse = ApiResponse.builder()
                 .code(errorCode.getCode())

@@ -45,7 +45,7 @@ public class AuthenticationService {
     @Value("${jwt.signerKey}")
     public String signerKey;
 
-    @Value("${jwt.valid-duraion}")
+    @Value("${jwt.valid-duration}")
     public String VALID_DURATION;
 
     @Value("${jwt.refresh-duration}")
@@ -79,19 +79,22 @@ public class AuthenticationService {
         JWSVerifier verifier = new MACVerifier(signerKey);
 
         // verify
-        boolean isvalid = signedJWT.verify(verifier);
+        boolean isValid = signedJWT.verify(verifier);
 
+        if (!isValid) throw new AppException(ErrorCode.INVALID_TOKEN);
         // trả về true nếu nằm sau exp nằm sau thời điểm hiện tại
-        boolean isExpriTime = isRefreshToken?
+        boolean isNotExpired = isRefreshToken?
                         signedJWT.getJWTClaimsSet().getIssueTime().toInstant()
                                 .plus(Long.parseLong(REFRESH_DURATION), ChronoUnit.SECONDS)
                                 .isAfter(Instant.now())
                         :
         signedJWT.getJWTClaimsSet().getExpirationTime().after(new Date());
 
+        if (isRefreshToken && !isNotExpired) throw new AppException(ErrorCode.TOKEN_IS_EXPIRED_REFRESH);
 
-        // token valid and expiryTime còn hạn
-        if(!(isvalid && isExpriTime)) throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        //throw nếu không( token valid and expiryTime còn hạn )
+        if(!(isValid && isNotExpired)) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         String UUID = signedJWT.getJWTClaimsSet().getJWTID();
 
@@ -151,9 +154,7 @@ public class AuthenticationService {
     public String buildScope(User user) {
         StringJoiner scopeJoiner = new StringJoiner(" ");
         if(userRepository.findByEmail(user.getEmail()).isPresent()) {
-            user.getRoles().forEach(role -> {
-                scopeJoiner.add("ROLE_" + role.getRoleName());
-            });
+            user.getRoles().forEach(role -> scopeJoiner.add("ROLE_" + role.getRoleName()));
         }
         return scopeJoiner.toString();
     }
