@@ -24,4 +24,5 @@ public class FlightCreationRequest {
     private String status;
 
     private String aircraftId;
+    private double basePrice;
 }

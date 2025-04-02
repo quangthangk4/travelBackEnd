@@ -11,19 +11,22 @@ import com.travel.travelling.entity.User;
 import com.travel.travelling.exception.AppException;
 import com.travel.travelling.exception.ErrorCode;
 import com.travel.travelling.mapper.TicketMapper;
-import com.travel.travelling.mapper.UserMapper;
 import com.travel.travelling.repository.FlightRepository;
 import com.travel.travelling.repository.TicketRepository;
 import com.travel.travelling.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TicketService {
@@ -32,14 +35,13 @@ public class TicketService {
     private final FlightRepository flightRepository;
     private final UserService userService;
     private final TicketRepository ticketRepository;
-    private final UserMapper userMapper;
     private final TicketMapper ticketMapper;
     private final UserRepository userRepository;
 
     // create ticket when create flight
     @Transactional
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public TicketResponse bookTicket(TicketBookRequest request){
+    public TicketResponse bookTicket(TicketBookRequest request, double seatPrice){
         Flight flight = flightRepository.findById(request.getFlightId())
                 .orElseThrow(() -> new AppException(ErrorCode.FLIGHT_NOT_EXISTED));
 
@@ -47,6 +49,11 @@ public class TicketService {
         User user = userRepository.findByEmail(userService.getMyInfo().getEmail()).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED)
         );
+
+        Optional<Ticket> ticketCheck = ticketRepository.findByUserAndFlight(user, flight);
+
+        if (ticketCheck.isPresent())
+            throw new AppException(ErrorCode.SEAT_ALREADY_BOOK_BY_YOU);
 
         // kiểm tra xem ghế chuẩn bị đặt có hợp lệ không
         if(!isValidSeatNumber(request.getSeatNumber(), flight.getTotalTickets()))
@@ -57,11 +64,6 @@ public class TicketService {
         if (seatBooked) {
             throw new AppException(ErrorCode.SEAT_ALREADY_BOOKED);
         }
-
-
-        // 4️⃣ Xác định giá vé dựa trên vị trí ghế
-        double basePrice = flight.getBasePrice();
-        double seatPrice = basePrice + (isWindowSeat(request.getSeatNumber()) ? 50_000.0 : 0.0);
 
         // trừ tiền vé máy bay
         if(user.getAccountBalance() < seatPrice) throw new AppException(ErrorCode.INSUFFICIENT_BALANCE);
@@ -101,7 +103,6 @@ public class TicketService {
 
         // 2️ Lấy số ghế và hàng ghế từ chuỗi
         int seatNum = Integer.parseInt(seatNumber.substring(0, seatNumber.length() - 1)); // Lấy số ghế
-        char row = seatNumber.charAt(seatNumber.length() - 1); // Lấy chữ cái cuối cùng (hàng ghế)
 
         // 3️ Tính tổng số ghế trên mỗi hàng
         int maxSeatsPerRow = totalSeats / 6;
@@ -111,10 +112,9 @@ public class TicketService {
     }
 
     // lấy tất cả ghế đã được đặt,
-    public List<TicketBookedResponse> ticketBookedResponse(String flightId){
+    public List<String> ticketBookedResponse(String flightId){
         List<Ticket> tickets = ticketRepository.findAllByFlightIdAndAvailable(flightId, false);
-
-        return tickets.stream().map(ticketMapper::toTicketBookedResponse).toList();
+        return tickets.stream().map(Ticket::getSeatNumber).collect(Collectors.toList());
     }
 
 
@@ -130,15 +130,12 @@ public class TicketService {
 
     // get my ticket (chưa bay)
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public List<TicketResponse> getUpComingTickets(){
+    public List<TicketResponse> getMyTickets(){
         User user = userRepository.findByEmail(userService.getMyInfo().getEmail()).orElseThrow(
                 () -> new AppException(ErrorCode.USER_NOT_EXISTED)
         );
         List<Ticket> tickets = ticketRepository.findByUser(user);
         return tickets.stream()
-                .filter(ticket -> {
-                    return ticket.getFlight().getDepartureTime().isAfter(LocalDateTime.now());
-                })
                 .map(ticketMapper::toTicketResponse)
                 .collect(Collectors.toList());
     }
@@ -183,7 +180,7 @@ public class TicketService {
 
 
         // hoàn tiền
-        double priceReturn = (double) ticket.getPrice()/2;
+        double priceReturn =  ticket.getPrice()/2;
         user.setAccountBalance(user.getAccountBalance() + priceReturn);
         String message = String.format("hủy vé thành công, đã hoàn trả lại %.2f đồng vào tài khoản", priceReturn);
         userRepository.save(user);

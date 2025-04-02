@@ -3,9 +3,9 @@ spring:
     name: travel
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/travel}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -16,9 +16,9 @@ spring:
 
     show-sql: true
     
-  docker:
-    compose:
-      enabled: false
+#  docker:
+#    compose:
+#      enabled: false
 
   data:
     redis:
@@ -29,7 +29,7 @@ spring:
 
 jwt:
   signerKey: ${SIGNER_KEY:ctTfcGw4IP2clJH+M6Nrx4EXs4mMW0Zk2CjNhW74KZka3TDSt5UpThtzg9iIB2CY}
-  valid-duration: 3600
+  valid-duration: 3600 #second
   refresh-duration: 18000
 
 

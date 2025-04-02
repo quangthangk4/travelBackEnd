@@ -31,16 +31,9 @@ public class Flight {
     private int totalTickets = 240;   // Tổng số vé có sẵn
     private int soldTickets;    // Số vé đã bán
 
-    @Builder.Default
-    private double basePrice = generateRandomPrice();
+    private double basePrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "airCraftId")
     private Aircraft airCraft;
-
-    private static double generateRandomPrice() {
-        Random random = new Random();
-        double price = 1000000 + Math.round(random.nextDouble() * 900000);
-        return Math.round(price / 50000.0) * 50000;
-    }
 }

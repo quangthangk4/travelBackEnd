@@ -20,4 +20,6 @@ public interface TicketRepository extends JpaRepository<Ticket, TicketId> {
     Optional<Ticket> findByFlightIdAndSeatNumberAndStatus(String flightId,String seatNumber, TicketStatus status);
 
     List<Ticket> findAllByFlightIdAndAvailable(String flightId, boolean available);
+
+    Optional<Ticket> findByUserAndFlight(User user, Flight flight);
 }

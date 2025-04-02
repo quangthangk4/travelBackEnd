@@ -1,6 +1,7 @@
 package com.travel.travelling.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.NonFinal;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,8 +28,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    @NonFinal
     public final String[] PUBLIC_ENDPOINT = {
-        "/auth/**", "/user/create", "/flight/search", "flight/{id}", "/airports/**", "tickets/available/{flightId}",
+        "/auth/**", "/user/create", "/flight/search", "flight/{id}", "/airports/**", "tickets/booked-seats/{flightId}",
+            "tickets/getAllHeldSeats/{flightId}",
     };
 
     private final JwtDecoderCustom jwtDecoderCustom;

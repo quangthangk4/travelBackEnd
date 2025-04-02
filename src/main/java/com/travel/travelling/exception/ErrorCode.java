@@ -27,6 +27,9 @@ public enum ErrorCode {
     INSUFFICIENT_BALANCE(1017, "Not enough balance!, không đủ tiền kìa má, nộp tiền zo đi!", HttpStatus.BAD_REQUEST),
     TICKET_NOT_EXISTED(1016, "Ticket not existed", HttpStatus.BAD_REQUEST),
     SEAT_NOT_HELD_BY_USER(1018, "Seat is not held by this user", HttpStatus.BAD_REQUEST),
+    SEAT_ALREADY_BOOK_BY_YOU(1019, "bạn đã đặt vé trước đó rồi", HttpStatus.BAD_REQUEST),
+    TOKEN_IS_EXPIRED_REFRESH(1020, "Token hết hạn refresh, vui lòng đăng nhập lại", HttpStatus.UNAUTHORIZED),
+    SEAT_ALREADY_HELD_BY_SOMEONE(1021, "Ghế đang được giữ bởi người khác, vui lòng chọn ghế khác", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode){
