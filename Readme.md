@@ -21,12 +21,7 @@ Một API backend mạnh mẽ cho ứng dụng đặt vé máy bay, được xâ
 - [Công nghệ sử dụng (Tech Stack)](#công-nghệ-sử-dụng-tech-stack)
 - [Yêu cầu cài đặt (Prerequisites)](#yêu-cầu-cài-đặt-prerequisites)
 - [Hướng dẫn cài đặt và Chạy](#hướng-dẫn-cài-đặt-và-chạy)
-- [Cấu hình (Configuration)](#cấu-hình-configuration)
-- [Tài liệu API (API Documentation)](#tài-liệu-api-api-documentation)
-- [Chạy Kiểm thử (Running Tests)](#chạy-kiểm-thử-running-tests)
 - [Triển khai (Deployment)](#triển-khai-deployment)
-- [Đóng góp (Contributing)](#đóng-góp-contributing)
-- [Giấy phép (License)](#giấy-phép-license)
 - [Liên hệ](#liên-hệ)
 
 ## Giới thiệu
@@ -64,64 +59,27 @@ Một API backend mạnh mẽ cho ứng dụng đặt vé máy bay, được xâ
 
 1.  **Clone repository:**
     ```bash
-    git clone [URL_REPOSITORY_CUA_BAN]
-    cd [TEN_THU_MUC_DU_AN]
+    git clone https://github.com/quangthangk4/travelBackEnd.git
     ```
 
-2.  **Cấu hình môi trường:**
-    Xem phần [Cấu hình (Configuration)](#cấu-hình-configuration) bên dưới. Bạn cần tạo file `application.properties` (hoặc `application-dev.properties` nếu dùng profiles) và điền các biến môi trường cần thiết.
-
-3.  **Build dự án (để tải dependencies):**
-    ```bash
-    mvn clean install
-    # hoặc nếu dùng Gradle:
-    # ./gradlew build
-    ```
-
-4.  **Chạy database và Redis (nếu dùng Docker Compose local):**
-    *   (Nếu có) Đảm bảo Docker đang chạy.
+3.  **Chạy docker compose:**
+    *   Đảm bảo Docker đang chạy.
+    *   bật cmd, powershell, wsl... (bất cứ thứ gì bạn có)
     *   Chạy lệnh:
         ```bash
-        docker-compose up -d # Chạy ngầm
+        cd [Đường dẫn thư mục clone về]
+        docker compose --env-file .env up -d
         ```
     *(Nếu không dùng Docker Compose, bạn cần đảm bảo có instance MySQL và Redis đang chạy và cấu hình kết nối đúng trong file properties)*
 
 5.  **Chạy ứng dụng Spring Boot:**
     ```bash
     mvn spring-boot:run
-    # hoặc nếu dùng Gradle:
-    # ./gradlew bootRun
-    # hoặc chạy file JAR đã build:
-    # java -jar target/[TEN_FILE_JAR].jar
     ```
 
-6.  Ứng dụng sẽ khởi chạy tại `http://localhost:[PORT]` (ví dụ: `http://localhost:8080`).
+6.  Ứng dụng sẽ khởi chạy tại `http://localhost:[8080]` 
 
 ## Cấu hình (Configuration)
-
 <!-- Giải thích cách cấu hình ứng dụng, thường là qua file application.properties/yml hoặc biến môi trường -->
-Ứng dụng được cấu hình chủ yếu thông qua file `src/main/resources/application.properties` (hoặc các file profile như `application-dev.properties`, `application-prod.properties`).
+Ứng dụng được cấu hình chủ yếu thông qua file `src/main/resources/application.yml`
 
-Các thuộc tính quan trọng cần cấu hình (hoặc đặt qua biến môi trường khi deploy):
-
-```properties
-# Database Configuration (Ví dụ)
-spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/travel_db}
-spring.datasource.username=${SPRING_DATASOURCE_USERNAME:root}
-spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:your_db_password}
-
-# Redis Configuration (Ví dụ)
-spring.data.redis.host=${SPRING_REDIS_HOST:localhost}
-spring.data.redis.port=${SPRING_REDIS_PORT:6379}
-spring.data.redis.password=${SPRING_REDIS_PASSWORD:} # Để trống nếu không có pass local
-spring.data.redis.ssl.enabled=${SPRING_REDIS_SSL_ENABLED:false} # true khi deploy lên Upstash
-
-# JWT Configuration (Ví dụ)
-jwt.signerKey=${SIGNER_KEY:your_strong_default_secret_key_for_local_dev}
-jwt.valid-duration=3600
-jwt.refresh-duration=18000
-
-# Server Port (Ví dụ)
-server.port=8080
-
-# ... (Thêm các cấu hình quan trọng khác)
